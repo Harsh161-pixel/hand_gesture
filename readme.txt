@@ -1,0 +1,1 @@
+installed  mediapipe libary of 0.10.14 version 
