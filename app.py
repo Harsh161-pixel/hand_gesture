@@ -3,12 +3,14 @@ import mediapipe as mp
 from collections import deque, Counter
 
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
+hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.6, min_tracking_confidence=0.6,
+                       model_complexity=1
+                       )
 mp_draw = mp.solutions.drawing_utils
 
 cap = cv2.VideoCapture(0)
 
-gesture_history = deque(maxlen=10)
+gesture_history = deque(maxlen=15)
 
 def get_gesture(landmarks):
     if not landmarks:
@@ -21,7 +23,7 @@ def get_gesture(landmarks):
     pinky_tip = landmarks.landmark[20]
 
     fingers_up = [
-        thumb_tip.y < landmarks.landmark[3].y,
+        thumb_tip.x < landmarks.landmark[3].x,
         index_tip.y < landmarks.landmark[6].y,
         middle_tip.y < landmarks.landmark[10].y,
         ring_tip.y < landmarks.landmark[14].y,
@@ -38,7 +40,7 @@ def get_gesture(landmarks):
         return "Open palm"
     elif fingers_up[1] and not any(fingers_up[2:]):
         return "pointing"
-    elif fingers_up[0] and not any(fingers_up[2:]):
+    elif fingers_up[0] and not any(fingers_up[1:]):
         return "thumbs up"
     elif fingers_up[1] and fingers_up[2] and not any(fingers_up[3:]):
         return "Victory"
